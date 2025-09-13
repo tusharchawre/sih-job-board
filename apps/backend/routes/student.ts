@@ -27,4 +27,4 @@ router.get("/:id", async (req, res) => {
     return res.status(200).json(student);
 });
 
-export default router;
+export  { router as studentRouter };
