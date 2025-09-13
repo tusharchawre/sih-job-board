@@ -1,5 +1,6 @@
 import { prisma } from "@repo/db/client";
 import express from "express";
+import pinecone from "@repo/pinecone/client";
 
 const app = express()
 
