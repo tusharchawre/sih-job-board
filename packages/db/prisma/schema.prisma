@@ -17,4 +17,120 @@ datasource db {
 model User {
   id        String   @id @default(uuid())
   email     String   @unique
+  createdAt DateTime @default(now())
+  student   Student?
+  isAdmin   Boolean  @default(false)
+}
+
+model Job {
+  id             String        @id @default(uuid())
+  jobTitle       String
+  jobDescription String
+  skillRequired  String[]
+  jobType        JOB_TYPE
+  salaryMin      Int?
+  salaryMax      Int?
+  applications   Application[]
+  createdAt      DateTime      @default(now())
+}
+
+enum JOB_TYPE {
+  INTERNSHIP
+  FULL_TIME
+  PART_TIME
+  CONTRACT
+}
+
+model Student {
+  id                String           @id @default(uuid())
+  name              String
+  ien               Int?
+  branch            BRANCH
+  yearofStudy       YEAROFSTUDY
+  resumeUrl         String?
+  cgpa              Float?
+  percentage10th    Float?
+  percentage12th    Float?
+  phoneNumber       Int?
+  skills            String[]
+  certifications    Certification[]
+  applications      Application[]
+  projects          Projects[]
+  githubUrl         String?
+  linkedinUrl       String?
+  twitterUrl        String?
+  workExperiences   workExperience[]
+  bio               String?
+  portfolioUrl      String?
+  isProfileComplete Boolean          @default(false)
+  user              User             @relation(fields: [userId], references: [id])
+  userId            String           @unique
+}
+
+enum BRANCH {
+  CSD
+  AIDS
+  COMPS
+  CIVIL
+  MTRX
+  MECH
+}
+
+enum YEAROFSTUDY {
+  FE
+  SE
+  TE
+  BE
+}
+
+model Application {
+  id              String             @id @default(uuid())
+  student         Student            @relation(fields: [studentId], references: [id])
+  studentId       String
+  job             Job                @relation(fields: [jobId], references: [id])
+  jobId           String
+  applicationDate DateTime           @default(now())
+  status          APPLICATION_STATUS @default(APPLIED)
+
+  @@unique([studentId, jobId])
+}
+
+enum APPLICATION_STATUS {
+  APPLIED
+  UNDER_REVIEW
+  REJECTED
+  ACCEPTED
+  INTERVIEW_SCHEDULED
+  OFFERED
+  WITHDRAWN
+}
+
+model Projects {
+  id          String  @id @default(uuid())
+  title       String
+  description String
+  link        String?
+  student     Student @relation(fields: [studentId], references: [id])
+  studentId   String
+}
+
+model Certification {
+  id          String  @id @default(uuid())
+  title       String
+  description String
+  link        String?
+  student     Student @relation(fields: [studentId], references: [id])
+  studentId   String
+}
+
+model workExperience {
+  id               String    @id @default(uuid())
+  companyName      String
+  role             String
+  startDate        DateTime
+  endDate          DateTime?
+  currentlyWorking Boolean   @default(false)
+  description      String
+  student          Student   @relation(fields: [studentId], references: [id])
+  studentId        String
 }
