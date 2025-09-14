@@ -67,6 +67,7 @@ model Student {
   githubUrl         String?
   linkedinUrl       String?
   twitterUrl        String?
+  studentVector     Int[]
   workExperiences   workExperience[]
   bio               String?
   portfolioUrl      String?

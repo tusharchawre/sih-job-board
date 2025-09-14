@@ -44,7 +44,7 @@ const JobForm = z
     {
       message: "Maximum salary must be greater than or equal to minimum salary",
       path: ["salaryMax"],
-    }
+    },
   );
 
 // Type inference for TypeScript

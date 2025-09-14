@@ -8,122 +8,121 @@ import { jobBoardIndex } from "@repo/pinecone/client";
 const router = Router();
 
 router.post("/create-job", async (req, res) => {
-    const session = await auth.api.getSession({
-        headers: fromNodeHeaders(req.headers),
-    });
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
 
-    if (!session) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }   
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-    const validatedData = await JobForm.safeParse(req.body);
+  const validatedData = await JobForm.safeParse(req.body);
 
-    if (!validatedData.success) {
-        return res.status(400).json({ error: validatedData.error.message });
-    }
+  if (!validatedData.success) {
+    return res.status(400).json({ error: validatedData.error.message });
+  }
 
-    const job = await prisma.job.create({
-        data: validatedData.data,
-    });
+  const job = await prisma.job.create({
+    data: validatedData.data,
+  });
 
-    await jobBoardIndex.upsertRecords([{
-        _id: job.id,
-        job_description: job.jobDescription,
-        job_title: job.jobTitle,
-        skill_required: job.skillRequired,
-        job_type: job.jobType,
-        salary_min: job.salaryMin ?? 0,
-        salary_max: job.salaryMax ?? 0,
-    }]);
+  await jobBoardIndex.upsertRecords([
+    {
+      _id: job.id,
+      job_description: job.jobDescription,
+      job_title: job.jobTitle,
+      skill_required: job.skillRequired,
+      job_type: job.jobType,
+      salary_min: job.salaryMin ?? 0,
+      salary_max: job.salaryMax ?? 0,
+    },
+  ]);
 
-    return res.status(200).json(job);
-})
-
+  return res.status(200).json(job);
+});
 
 router.put("/edit-job/:id", async (req, res) => {
-    const session = await auth.api.getSession({
-        headers: fromNodeHeaders(req.headers),
-    });
-    
-    if (!session) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
 
-    const { id } = req.params;
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-    const validatedData = await JobForm.safeParse(req.body);
-    
-    if (!validatedData.success) {
-        return res.status(400).json({ error: validatedData.error.message });
-    }
+  const { id } = req.params;
 
-    const job = await prisma.job.update({
-        where: { id: id },
-        data: validatedData.data,
-    }); 
+  const validatedData = await JobForm.safeParse(req.body);
 
-    await jobBoardIndex.deleteOne(job.id);
+  if (!validatedData.success) {
+    return res.status(400).json({ error: validatedData.error.message });
+  }
 
-    await jobBoardIndex.upsertRecords([{
-        _id: job.id,
-        job_description: job.jobDescription,
-        job_title: job.jobTitle,
-        skill_required: job.skillRequired,
-        job_type: job.jobType,
-        salary_min: job.salaryMin ?? 0,
-        salary_max: job.salaryMax ?? 0,
-    }]);
+  const job = await prisma.job.update({
+    where: { id: id },
+    data: validatedData.data,
+  });
 
-    return res.status(200).json(job);
-})
+  await jobBoardIndex.deleteOne(job.id);
 
+  await jobBoardIndex.upsertRecords([
+    {
+      _id: job.id,
+      job_description: job.jobDescription,
+      job_title: job.jobTitle,
+      skill_required: job.skillRequired,
+      job_type: job.jobType,
+      salary_min: job.salaryMin ?? 0,
+      salary_max: job.salaryMax ?? 0,
+    },
+  ]);
+
+  return res.status(200).json(job);
+});
 
 router.delete("/delete-job/:id", async (req, res) => {
-    const session = await auth.api.getSession({
-        headers: fromNodeHeaders(req.headers),
-    });
-    
-    if (!session) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
 
-    const { id } = req.params;
-    await prisma.job.delete({
-        where: { id: id },
-    })
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-    await jobBoardIndex.deleteOne(id);
+  const { id } = req.params;
+  await prisma.job.delete({
+    where: { id: id },
+  });
 
-    return res.status(200).json({ message: "Job deleted successfully" });
-})
+  await jobBoardIndex.deleteOne(id);
 
-
+  return res.status(200).json({ message: "Job deleted successfully" });
+});
 
 router.get("/export-data/:id", async (req, res) => {
-    const session = await auth.api.getSession({
-        headers: fromNodeHeaders(req.headers),
-    });
-    
-    if (!session) {
-        return res.status(401).json({ error: "Unauthorized" });
-    }
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
 
-    const { id } = req.params;
-    const job = await prisma.job.findUnique({
-        where: { id: id },
-        include: {
-            applications: true,
-        },
-    });
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
 
-    // TODO: Export data to excel
-    
-    if (!job) {
-        return res.status(404).json({ error: "Job not found" });
-    }
+  const { id } = req.params;
+  const job = await prisma.job.findUnique({
+    where: { id: id },
+    include: {
+      applications: true,
+    },
+  });
 
-    return res.status(200).json(job);
-})
+  // TODO: Export data to excel
 
+  if (!job) {
+    return res.status(404).json({ error: "Job not found" });
+  }
+
+  return res.status(200).json(job);
+});
 
 export { router as adminRoutes };

@@ -13,22 +13,21 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
 
-      async callback({ user, account }: {user: any, account: any}) {
+      async callback({ user, account }: { user: any; account: any }) {
         const email = user.email?.toLowerCase();
         const allowedDomain = "nhtim.ac.in";
 
         if (!email || !email.endsWith(`@${allowedDomain}`)) {
           throw new Error(
-            `Google sign-in is only allowed for ${allowedDomain} email addresses`
+            `Google sign-in is only allowed for ${allowedDomain} email addresses`,
           );
         }
 
         return { user, account };
       },
     },
-
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7,
-  }
+  },
 });
