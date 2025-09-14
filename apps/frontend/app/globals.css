@@ -5,14 +5,14 @@
 
 :root {
     --color-background: oklch(98.5% 0 0);
-    --color-foreground: oklch(79.2% 0.209 151.711);
-    --color-button-background: oklch(62.7% 0.194 149.214);
+    --color-foreground:oklch(54.6% 0.245 262.881);
+    --color-button-background: oklch(54.6% 0.245 262.881);
     --color-button-foreground: oklch(98.5% 0 0);
     --color-button-border: oklch(62.7% 0.194 149.214);
-    --color-button-hover-background: oklch(57.4% 0.181 146.713);
+    --color-button-hover-background:oklch(54.6% 0.245 262.881);
     --color-button-hover-foreground: oklch(98.5% 0 0);
-    --color-button-hover-border: oklch(57.4% 0.181 146.713);
-    --color-button-active-background: oklch(52.1% 0.168 144.212);
+    --color-button-hover-border: oklch(54.6% 0.245 262.881);
+    --color-button-active-background: oklch(54.6% 0.245 262.881);
     --color-button-active-foreground: oklch(98.5% 0 0);
     --color-button-active-border: oklch(52.1% 0.168 144.212);
     --radius: 0.625rem;
