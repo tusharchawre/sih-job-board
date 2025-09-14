@@ -6,18 +6,6 @@ const pc = new Pinecone({
 
 export default pc;
 
-const indexName = "job-board";
-await pc.createIndexForModel({
-  name: indexName,
-  cloud: "aws",
-  region: "us-east-1",
-  embed: {
-    model: "llama-text-embed-v2",
-    fieldMap: { job_description: "chunk_text" },
-  },
-  waitUntilReady: true,
-});
+export const jobBoardIndex = pc.index(process.env.PINECONE_INDEX!, process.env.PINECONE_HOST).namespace(process.env.PINECONE_NAMESPACE!);
 
-const index = pc.index(indexName).namespace("job-board");
 
-export { index as jobBoardIndex };
