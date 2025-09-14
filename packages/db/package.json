@@ -3,12 +3,15 @@
   "module": "index.ts",
   "type": "module",
   "private": true,
+  "scripts": {
+    "seed": "bun run seed.ts"
+  },
   "devDependencies": {
     "@types/bun": "latest"
   },
   "exports": {
     "./client": "./index.ts"
-  }, 
+  },
   "peerDependencies": {
     "typescript": "^5"
   },

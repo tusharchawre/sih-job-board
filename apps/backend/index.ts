@@ -9,16 +9,23 @@ import { toNodeHandler } from "better-auth/node";
 import { auth } from "./utils/auth";
 
 const app = express();
+app.use(
+  cors({
+    origin:"http://localhost:3000",
+    methods: ["GET", "POST", "PUT", "DELETE"],
+    credentials: true,
+  })
+);
 
 app.all("/api/auth/*splat", toNodeHandler(auth));
 
-app.use(cors());
+
 app.use(express.json());
 
 app.use("/api/jobs", jobsRoutes);
 app.use("/api/student", studentRoutes);
-app.use("/api/admin", adminRoutes); 
+app.use("/api/admin", adminRoutes);
 
 app.listen(8080, () => {
-  console.log("Server is running on port 3000");
+  console.log("Server is running on port 8080");
 });
