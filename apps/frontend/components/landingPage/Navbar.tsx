@@ -93,7 +93,7 @@ export function Navbar() {
           {/* Logo Section */}
           <div className="">
             <Link href="/" className="flex items-center">
-              <div className="text-2xl font-bold text-foreground">JobBoard</div>
+              <div className="text-2xl font-bold text-foreground">InternHub</div>
             </Link>
           </div>
 

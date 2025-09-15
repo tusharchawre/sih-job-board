@@ -11,7 +11,7 @@ export function Footer() {
               <div className="w-8 h-8 bg-button-background rounded-lg flex items-center justify-center">
                 <span className="text-button-foreground font-bold text-sm">JB</span>
               </div>
-              <span className="text-xl font-bold text-foreground">JobBoard</span>
+              <span className="text-xl font-bold text-foreground">InternHub</span>
             </div>
             <p className="text-muted-foreground text-sm leading-relaxed">
               Connect talented professionals with innovative startups worldwide. Building the future of work, one
@@ -36,18 +36,18 @@ export function Footer() {
             </div>
           </div>
 
-          {/* For Job Seekers */}
+          {/* For Students */}
           <div className="space-y-4">
-            <h3 className="text-foreground font-semibold">For Job Seekers</h3>
+            <h3 className="text-foreground font-semibold">For Students</h3>
             <ul className="space-y-2">
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-button-background transition-colors text-sm">
-                  Browse Jobs
+                  Browse Internships
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-button-background transition-colors text-sm">
-                  Career Advice
+                  Career Guidance
                 </Link>
               </li>
               <li>
@@ -57,12 +57,12 @@ export function Footer() {
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-button-background transition-colors text-sm">
-                  Salary Guide
+                  Campus Events
                 </Link>
               </li>
               <li>
                 <Link href="#" className="text-muted-foreground hover:text-button-background transition-colors text-sm">
-                  Interview Tips
+                  Student Resources
                 </Link>
               </li>
             </ul>

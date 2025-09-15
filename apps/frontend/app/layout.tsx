@@ -11,8 +11,8 @@ const poppins = Poppins({
 });
 
 export const metadata: Metadata = {
-  title: "Job Board",
-  description: "Job Board",
+  title: "Student Internship Platform",
+  description: "Find internships and entry-level jobs tailored for college students",
 };
 
 export default function RootLayout({
