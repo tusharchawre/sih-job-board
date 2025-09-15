@@ -6,6 +6,6 @@ const pc = new Pinecone({
 
 export default pc;
 
-export const jobBoardIndex = pc.index(process.env.PINECONE_INDEX!, process.env.PINECONE_HOST).namespace(process.env.PINECONE_NAMESPACE!);
+export const jobBoardIndex = pc.index("sih-job-board").namespace("__default__");
 
 

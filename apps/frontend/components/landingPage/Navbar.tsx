@@ -19,6 +19,7 @@ export function Navbar() {
     name: string;
     email: string;
     image: string;
+    role?: string;
   } | null>(null);
   const [isLoading, setIsLoading] = useState(true);
   const router = useRouter();
@@ -32,14 +33,34 @@ export function Navbar() {
       try {
         const session = await authClient.getSession();
         if (session && session.data) {
-          setUser(
-            session.data.user as {
-              id: string;
-              name: string;
-              email: string;
-              image: string;
-            }
-          );
+          // Fetch user profile to get role from admin plugin
+          const profileResponse = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/admin/profile`, {
+            method: 'GET',
+            headers: {
+              'Content-Type': 'application/json',
+            },
+            credentials: 'include',
+          });
+
+          if (profileResponse.ok) {
+            const profile = await profileResponse.json();
+            setUser({
+              id: session.data.user.id,
+              name: session.data.user.name || '',
+              email: session.data.user.email,
+              image: session.data.user.image || '',
+              role: profile.role,
+            });
+          } else {
+            // Fallback to session data with default role
+            setUser({
+              id: session.data.user.id,
+              name: session.data.user.name || '',
+              email: session.data.user.email,
+              image: session.data.user.image || '',
+              role: "user",
+            });
+          }
         } else {
           setUser(null);
         }
@@ -141,6 +162,28 @@ export function Navbar() {
                   >
                     Account
                   </DropdownMenuItem>
+                  {user.role === "admin" && (
+                    <DropdownMenuItem
+                      icon={
+                        <svg
+                          className="w-4 h-4"
+                          fill="none"
+                          stroke="currentColor"
+                          viewBox="0 0 24 24"
+                        >
+                          <path
+                            strokeLinecap="round"
+                            strokeLinejoin="round"
+                            strokeWidth={2}
+                            d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                          />
+                        </svg>
+                      }
+                      onClick={() => router.push("/admin")}
+                    >
+                      Admin Dashboard
+                    </DropdownMenuItem>
+                  )}
                   <DropdownMenuItem
                     icon={
                       <svg

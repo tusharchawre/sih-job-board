@@ -7,6 +7,37 @@ import { jobBoardIndex } from "@repo/pinecone/client";
 
 const router = Router();
 
+router.get("/profile", async (req, res) => {
+  const session = await auth.api.getSession({
+    headers: fromNodeHeaders(req.headers),
+  });
+
+  if (!session) {
+    return res.status(401).json({ error: "Unauthorized" });
+  }
+
+  const user = await prisma.user.findUnique({
+    where: { id: session.user.id },
+    select: {
+      id: true,
+      email: true,
+      name: true,
+      emailVerified: true,
+      image: true,
+      role: true,
+    },
+  });
+
+  if (!user) {
+    return res.status(404).json({ error: "User not found" });
+  }
+
+  // The admin plugin should add role info to the session
+  return res.status(200).json({
+    ...user,
+  });
+});
+
 router.post("/create-job", async (req, res) => {
   const session = await auth.api.getSession({
     headers: fromNodeHeaders(req.headers),
@@ -26,17 +57,22 @@ router.post("/create-job", async (req, res) => {
     data: validatedData.data,
   });
 
-  await jobBoardIndex.upsertRecords([
-    {
-      _id: job.id,
-      job_description: job.jobDescription,
-      job_title: job.jobTitle,
-      skill_required: job.skillRequired,
-      job_type: job.jobType,
-      salary_min: job.salaryMin ?? 0,
-      salary_max: job.salaryMax ?? 0,
-    },
-  ]);
+  // Tolerate Pinecone errors (e.g., 404) so DB write isn't blocked
+  try {
+    await jobBoardIndex.upsertRecords([
+      {
+        _id: job.id,
+        jobDescription: job.jobDescription,
+        jobTitle: job.jobTitle,
+        skillRequired: job.skillRequired,
+        jobType: job.jobType,
+        salaryMin: job.salaryMin ?? 0,
+        salaryMax: job.salaryMax ?? 0,
+      },
+    ]);
+  } catch (error) {
+    console.log("Pinecone upsert failed; continuing", { id: job.id, error });
+  }
 
   return res.status(200).json(job);
 });
@@ -63,19 +99,28 @@ router.put("/edit-job/:id", async (req, res) => {
     data: validatedData.data,
   });
 
-  await jobBoardIndex.deleteOne(job.id);
+  // Best-effort: ignore Pinecone 404s or transient errors
+  try {
+    await jobBoardIndex.deleteOne(job.id);
+  } catch (error) {
+    console.warn("Pinecone delete failed; continuing", { id: job.id, error });
+  }
 
-  await jobBoardIndex.upsertRecords([
-    {
-      _id: job.id,
-      job_description: job.jobDescription,
-      job_title: job.jobTitle,
-      skill_required: job.skillRequired,
-      job_type: job.jobType,
-      salary_min: job.salaryMin ?? 0,
-      salary_max: job.salaryMax ?? 0,
-    },
-  ]);
+  try {
+    await jobBoardIndex.upsertRecords([
+      {
+        _id: job.id,
+        jobDescription: job.jobDescription,
+        jobTitle: job.jobTitle,
+        skillRequired: job.skillRequired,
+        jobType: job.jobType,
+        salaryMin: job.salaryMin ?? 0,
+        salaryMax: job.salaryMax ?? 0,
+      },
+    ]);
+  } catch (error) {
+    console.warn("Pinecone upsert failed; continuing", { id: job.id, error });
+  }
 
   return res.status(200).json(job);
 });
@@ -94,7 +139,11 @@ router.delete("/delete-job/:id", async (req, res) => {
     where: { id: id },
   });
 
-  await jobBoardIndex.deleteOne(id);
+  try {
+    await jobBoardIndex.deleteOne(id);
+  } catch (error) {
+    console.warn("Pinecone delete failed; continuing", { id, error });
+  }
 
   return res.status(200).json({ message: "Job deleted successfully" });
 });

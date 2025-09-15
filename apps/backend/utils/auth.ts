@@ -2,6 +2,7 @@ import { prisma } from "@repo/db/client";
 import { APIError, betterAuth, type Account } from "better-auth";
 import { prismaAdapter } from "better-auth/adapters/prisma";
 import { createAuthMiddleware } from "better-auth/api";
+import { admin } from "better-auth/plugins";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {

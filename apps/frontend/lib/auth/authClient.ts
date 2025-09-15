@@ -4,12 +4,18 @@ export const authClient = createAuthClient({
   baseURL: process.env.NEXT_PUBLIC_API_URL!,
 });
 
-const signIn = () =>
-  authClient.signIn.social({
+const signIn = () => {
+  const isAdminContext = typeof window !== 'undefined' && window.location.pathname.startsWith('/admin');
+  const callbackURL = isAdminContext
+    ? `${process.env.NEXT_PUBLIC_FRONTEND_URL!}/admin`
+    : `${process.env.NEXT_PUBLIC_FRONTEND_URL!}/home`;
+
+  return authClient.signIn.social({
     provider: "google",
-    callbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL!}/home`,
+    callbackURL,
     errorCallbackURL: `${process.env.NEXT_PUBLIC_FRONTEND_URL!}/about`,
   });
+};
 
 const signOut = () => authClient.signOut();
 
