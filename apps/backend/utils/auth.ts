@@ -1,8 +1,7 @@
-import { betterAuth, type Account } from "better-auth";
-import { prismaAdapter } from "better-auth/adapters/prisma";
-// If your Prisma file is located elsewhere, you can change the path
 import { prisma } from "@repo/db/client";
-import type { User } from "../../../packages/db/generated/prisma";
+import { APIError, betterAuth, type Account } from "better-auth";
+import { prismaAdapter } from "better-auth/adapters/prisma";
+import { createAuthMiddleware } from "better-auth/api";
 
 export const auth = betterAuth({
   database: prismaAdapter(prisma, {
@@ -14,13 +13,16 @@ export const auth = betterAuth({
       clientId: process.env.GOOGLE_CLIENT_ID!,
       clientSecret: process.env.GOOGLE_CLIENT_SECRET!,
       hd: "nhtim.ac.in",
-      
     },
-      
   },
   session: {
     expiresIn: 60 * 60 * 24 * 7,
   },
-
-
+  hooks: {
+    after: createAuthMiddleware(async (ctx) => {
+      if (ctx.context.session && !ctx.context.session?.user.email.endsWith("@nhtim.ac.in")) {
+        console.log(ctx.context.session.user.email)
+      }
+    }),
+  },
 });
